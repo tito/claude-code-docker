@@ -24,8 +24,8 @@ if (-not (Test-Path $ClaudeDir)) {
 
 $ClaudeConfigFile = Join-Path $env:CLAUDE_CODE_HOME ".claude.json"
 if (-not (Test-Path $ClaudeConfigFile)) {
-    New-Item -Path $ClaudeConfigFile -ItemType File -Force | Out-Null
-    Write-Host "Created empty $ClaudeConfigFile file"
+    "{}" | Out-File -FilePath $ClaudeConfigFile -Encoding utf8 -Force
+    Write-Host "Created $ClaudeConfigFile with empty JSON object"
 }
 
 $CURRENT_DIR = (Get-Location).Path
