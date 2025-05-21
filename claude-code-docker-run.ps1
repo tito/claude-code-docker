@@ -39,9 +39,9 @@ try {
         -v "${CURRENT_DIR}:/workspace/${CURRENT_DIR_BASENAME}" `
         -v "${ClaudeDir}:/home/node/.claude" `
         -v "${ClaudeConfigFile}:/home/node/.claude.json" `
-        --entrypoint /bin/bash `
+        --entrypoint /bin/zsh `
         $DOCKER_IMG `
-        -c "cd /workspace/${CURRENT_DIR_BASENAME} && claude $remainingArgs && bash"
+        -c "cd /workspace/${CURRENT_DIR_BASENAME} && claude $remainingArgs && zsh"
 } catch {
     Write-Error "Error running Docker: $_"
     exit 1
