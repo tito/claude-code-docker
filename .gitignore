@@ -1,0 +1,9 @@
+/.idea
+
+/.env*
+!.env-template
+
+/tmp
+
+*.log
+/version.txt
