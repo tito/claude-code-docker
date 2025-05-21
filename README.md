@@ -1,59 +1,41 @@
 # Claude Code Docker Image
 
-This repository contains Docker configurations and scripts to run Claude Code in a Docker container, primarily intended for Windows users who need to use Claude Code in a containerized environment.
+This repository contains Docker configurations and scripts to run Claude Code in a Docker container, 
+primarily intended for Windows users who need to use Claude Code in a containerized environment.
 
-## Key Components
+For development and architecture details, see [DEVELOP.md](DEVELOP.md).
 
-- `Dockerfile`: Defines the Docker image with Node.js and necessary dependencies for running Claude Code
-  - Uses node:20-slim as base image
-  - Installs required system packages
-  - Installs Python and pip for code-index-mcp dependency
-  - Sets up environment for Claude Code
-- Shell scripts for building, running, and publishing the Docker image:
-  - `docker-build.sh`: Builds the Docker image locally
-  - `docker-run-local.sh`: Runs Claude Code in the Docker container
-  - `docker-push.sh`: Pushes the Docker image to Docker Hub
-- Windows support:
-  - `claude-code-docker-run.ps1`: PowerShell script for running Claude Code in Docker on Windows
-  - `claude-code-docker-run.bat`: Batch file wrapper for the PowerShell script
+## Quick Start - Download Scripts
 
-## Setting Up
-
-First copy the `.env-template` to `.env` and edit with your info:
+### Linux/macOS
 
 ```bash
-cp .env-template .env
+wget https://raw.githubusercontent.com/idachev/claude-code-docker/master/claude-code-docker-run.sh -O claude-code-docker-run.sh && chmod +x claude-code-docker-run.sh
 ```
 
-You can configure the following environment variables:
-- `IGD_UTILS_DOCKER_IMG`: Docker image name (default: idachev-claude-code)
-- `IGD_UTILS_DOCKER_TAG`: Docker image tag (default: latest)
+### Windows
+
+```powershell
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/idachev/claude-code-docker/master/claude-code-docker-run.ps1 -OutFile claude-code-docker-run.ps1
+```
 
 ## Usage
 
-### Building the Docker Image
+### On Linux/macOS
 
 ```bash
-./docker-build.sh
-```
-
-### Running Claude Code in Docker
-
-#### On Linux/macOS
-
-```bash
-./docker-run-local.sh
+./claude-code-docker-run.sh
 ```
 
 You can set a custom location for Claude configuration files:
 
 ```bash
-CLAUDE_CODE_HOME=/path/to/custom/dir ./docker-run-local.sh
+CLAUDE_CODE_HOME=/path/to/custom/dir ./claude-code-docker-run.sh
 ```
 
-#### On Windows
+### On Windows
 
-##### Prerequisites
+#### Prerequisites
 
 Before running Claude Code in Docker on Windows, ensure that:
 
@@ -72,18 +54,10 @@ Before running Claude Code in Docker on Windows, ensure that:
    Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
    ```
 
-##### Running the Container
-
-For PowerShell:
+#### Running the Container
 
 ```powershell
 .\claude-code-docker-run.ps1
-```
-
-For Command Prompt:
-
-```cmd
-claude-code-docker-run.bat
 ```
 
 You can set a custom location for Claude configuration files:
@@ -93,21 +67,12 @@ $env:CLAUDE_CODE_HOME = "D:\path\to\custom\dir"
 .\claude-code-docker-run.ps1
 ```
 
-### Publishing the Docker Image
+## Updates and Exiting
 
-```bash
-./docker-push.sh
-```
+When Claude Code completes an auto-update, you can:
 
-## Technical Details
+1. Type `exit` once to exit Claude Code, which will return you to the Docker container's bash shell
+2. Start Claude Code again to use the updated version by running `claude` within the bash shell 
+3. To completely exit the Docker container, type `exit` a second time in the bash shell
 
-The Docker image includes:
-- Node.js 20 (slim version)
-- Python 3 and pip for code-index-mcp
-- Git, zsh, ripgrep and other development tools
-- The Claude Code CLI tool
-
-Important implementation notes:
-- The Docker image switches between root and node users for different installation steps
-- The final image uses the node user for security best practices
-- Apt cache is cleaned up after all apt commands to reduce image size
+This allows you to restart Claude with the updated version without having to restart the entire Docker container.
