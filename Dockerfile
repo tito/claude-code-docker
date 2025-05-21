@@ -1,30 +1,15 @@
-FROM node:20-slim
+FROM node:20
 
 ARG TZ
 ENV TZ="$TZ"
 
-RUN apt update && apt install -y less \
-  git \
-  procps \
-  sudo \
-  fzf \
-  zsh \
-  man-db \
-  unzip \
-  gnupg2 \
-  gh \
-  iptables \
-  ipset \
-  iproute2 \
-  dnsutils \
-  aggregate \
-  jq
+RUN apt update && apt install -y less git procps fzf zsh man-db unzip gnupg2 gh \
+  ipset iproute2 dnsutils aggregate ripgrep jq wget python3 python3-pip
+
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /usr/local/share/npm-global && \
   chown -R node:node /usr/local/share
-
-# https://github.com/johnhuang316/code-index-mcp
-RUN pip install code-index-mcp
 
 ARG USERNAME=node
 
@@ -42,7 +27,7 @@ WORKDIR /workspace
 
 RUN ARCH=$(dpkg --print-architecture) && \
   wget "https://github.com/dandavison/delta/releases/download/0.18.2/git-delta_0.18.2_${ARCH}.deb" && \
-  sudo dpkg -i "git-delta_0.18.2_${ARCH}.deb" && \
+  dpkg -i "git-delta_0.18.2_${ARCH}.deb" && \
   rm "git-delta_0.18.2_${ARCH}.deb"
 
 USER node
@@ -52,13 +37,16 @@ ENV PATH=$PATH:/usr/local/share/npm-global/bin
 
 ENV SHELL /bin/zsh
 
-RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.2.0/zsh-in-docker.sh)" -- \
+RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.2.1/zsh-in-docker.sh)" -- \
   -p git \
   -p fzf \
   -a "source /usr/share/doc/fzf/examples/key-bindings.zsh" \
   -a "source /usr/share/doc/fzf/examples/completion.zsh" \
   -a "export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
   -x
+
+# https://github.com/johnhuang316/code-index-mcp
+RUN pip install --break-system-packages code-index-mcp
 
 RUN npm install -g @anthropic-ai/claude-code
 

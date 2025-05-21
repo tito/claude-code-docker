@@ -2,47 +2,53 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Repository Purpose
+## Development Standards
 
-This repository contains Docker configurations and scripts to run Claude Code in a Docker container, primarily intended for Windows users who need to use Claude Code in a containerized environment.
+When modifying this codebase, follow these guidelines:
 
-## Key Components
+### Dockerfile Best Practices
 
-- `Dockerfile`: Defines the Docker image with Node.js and necessary dependencies for running Claude Code
-- Shell scripts for building, running, and publishing the Docker image:
-  - `docker-build.sh`: Builds the Docker image locally
-  - `docker-run-local.sh`: Runs Claude Code in the Docker container
-  - `docker-push-public.sh`: Pushes the Docker image to Docker Hub
+- Keep the base image lightweight (node:20-slim)
+- Consolidate RUN commands where possible to reduce layers
+- Clean up apt cache after installations
+- Use specific versions for packages when possible
+- Follow security best practices (run as non-root, limit permissions)
 
-## Environment Setup
+### Shell Script Standards
 
-The repository uses a `.env` file (created from `.env-template`) to configure Docker image names and tags:
-- `IGD_UTILS_DOCKER_IMG`: Docker image name (default: idachev-claude-code)
-- `IGD_UTILS_DOCKER_TAG`: Docker image tag (default: latest)
+- Include proper error handling and exit codes
+- Validate inputs and environment variables
+- Use proper quoting for variables
+- Include meaningful error messages
+- Document script purpose and usage
 
-## Common Commands
+### Git Workflow
 
-### Building the Docker Image
+- Commit with descriptive messages
+- Group related changes
+- Validate functionality before pushing
 
-```bash
-./docker-build.sh
-```
+## Common Development Tasks
 
-### Running Claude Code in Docker
+### Updating Package Versions
 
-```bash
-./docker-run-local.sh
-```
+When updating package versions in the Dockerfile:
+1. Research compatibility of new versions
+2. Update the specific package version
+3. Test the build and functionality
+4. Document changes in commit message
 
-### Publishing the Docker Image
+### Adding New Dependencies
 
-```bash
-./docker-push-public.sh
-```
+When adding new dependencies to the Dockerfile:
+1. Add the dependency to the appropriate apt install command
+2. Consider impact on image size and build time
+3. Ensure compatibility with existing packages
+4. Test the build with the new dependency
 
-## Development Workflow
+### Modifying Environment Variables
 
-1. Make changes to the `Dockerfile` or scripts as needed
-2. Build the image using `./docker-build.sh`
-3. Test the image using `./docker-run-local.sh`
-4. If ready to publish, use `./docker-push-public.sh`
+When adding/modifying environment variables:
+1. Update both the Dockerfile and .env-template
+2. Document the purpose of the variable
+3. Provide sensible defaults where possible

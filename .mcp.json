@@ -1,0 +1,40 @@
+{
+  "mcpServers": {
+    "context7": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest"
+      ],
+      "env": {}
+    },
+    "sequential-thinking": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+      "env": {}
+    },
+    "memory": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ],
+      "env": {
+        "MEMORY_FILE_PATH": "/var/tmp/claude-memory-claude-code-docker.json"
+      }
+    },
+    "code-index": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "code-index-mcp"
+      ],
+      "env": {}
+    }
+  }
+}
