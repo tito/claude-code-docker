@@ -48,7 +48,7 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
 # https://github.com/johnhuang316/code-index-mcp
 RUN pip install --break-system-packages code-index-mcp
 
-RUN pip install --break-system-packages uvx
+RUN pip install --break-system-packages uv
 
 RUN npm install -g @anthropic-ai/claude-code
 
