@@ -1,10 +1,10 @@
 param (
-    [switch]$Debug,
+    [switch]$DebugMode,
     [Parameter(ValueFromRemainingArguments=$true)]
-    [string[]]$args
+    [string[]]$remainingArgs
 )
 
-if ($Debug) {
+if ($DebugMode) {
     $DebugPreference = 'Continue'
 }
 
@@ -45,7 +45,7 @@ try {
         -v "${CLAUDE_CONFIG_DOCKER}:/home/node/.claude.json" `
         --entrypoint /bin/bash `
         $DOCKER_IMG `
-        -c "cd /workspace/${CURRENT_DIR_BASENAME} && claude $args"
+        -c "cd /workspace/${CURRENT_DIR_BASENAME} && claude $remainingArgs"
 } catch {
     Write-Error "Error running Docker: $_"
     exit 1

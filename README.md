@@ -53,6 +53,27 @@ CLAUDE_CODE_HOME=/path/to/custom/dir ./docker-run-local.sh
 
 #### On Windows
 
+##### Prerequisites
+
+Before running Claude Code in Docker on Windows, ensure that:
+
+1. Virtual Machine Platform is enabled (required for Docker):
+   ```powershell
+   # Run as Administrator in PowerShell
+   Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform
+   ```
+
+2. PowerShell execution policy is set appropriately:
+   ```powershell
+   # For the current process only
+   Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+   # Or for the current user (more permanent)
+   Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+   ```
+
+##### Running the Container
+
 For PowerShell:
 
 ```powershell
