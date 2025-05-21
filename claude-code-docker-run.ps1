@@ -24,7 +24,7 @@ if (-not (Test-Path $ClaudeDir)) {
 
 $ClaudeConfigFile = Join-Path $env:CLAUDE_CODE_HOME ".claude.json"
 if (-not (Test-Path $ClaudeConfigFile)) {
-    "{}" | Out-File -FilePath $ClaudeConfigFile -Encoding utf8 -Force
+    "" | Out-File -FilePath $ClaudeConfigFile -Encoding utf8 -Force
     Write-Host "Created $ClaudeConfigFile with empty JSON object"
 }
 
@@ -33,19 +33,15 @@ $CURRENT_DIR_BASENAME = Split-Path -Leaf $CURRENT_DIR
 
 $DOCKER_NAME = "claude-code"
 
-$CURRENT_DIR_DOCKER = $CURRENT_DIR -replace '\\', '/' -replace '^([A-Za-z]):', '//$1'
-$CLAUDE_DIR_DOCKER = $ClaudeDir -replace '\\', '/' -replace '^([A-Za-z]):', '//$1'
-$CLAUDE_CONFIG_DOCKER = $ClaudeConfigFile -replace '\\', '/' -replace '^([A-Za-z]):', '//$1'
-
 try {
     & docker run -it --rm `
         --name $DOCKER_NAME `
-        -v "${CURRENT_DIR_DOCKER}:/workspace/${CURRENT_DIR_BASENAME}" `
-        -v "${CLAUDE_DIR_DOCKER}:/home/node/.claude" `
-        -v "${CLAUDE_CONFIG_DOCKER}:/home/node/.claude.json" `
+        -v "${CURRENT_DIR}:/workspace/${CURRENT_DIR_BASENAME}" `
+        -v "${ClaudeDir}:/home/node/.claude" `
+        -v "${ClaudeConfigFile}:/home/node/.claude.json" `
         --entrypoint /bin/bash `
         $DOCKER_IMG `
-        -c "cd /workspace/${CURRENT_DIR_BASENAME} && claude $remainingArgs"
+        -c "cd /workspace/${CURRENT_DIR_BASENAME} && claude $remainingArgs && bash"
 } catch {
     Write-Error "Error running Docker: $_"
     exit 1

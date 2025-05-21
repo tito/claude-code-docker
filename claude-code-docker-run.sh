@@ -33,4 +33,4 @@ docker run -it --rm \
   -v "${CLAUDE_CODE_HOME}/.claude.json":"/home/node/.claude.json" \
   --entrypoint /bin/bash \
   "${DOCKER_IMG}" \
-  -c 'cd /workspace/"'"${CURRENT_DIR_BASENAME}"'" && claude "'"${@}"'"'
+  -c 'cd /workspace/"'"${CURRENT_DIR_BASENAME}"'" && claude "'"${@}"'" && bash'
