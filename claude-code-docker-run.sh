@@ -25,6 +25,7 @@ CURRENT_DIR_BASENAME=$(basename "${CURRENT_DIR}")
 
 DOCKER_NAME="claude-code"
 
+# shellcheck disable=SC2145
 docker run -it --rm \
   --name "${DOCKER_NAME}" \
   -v "${CURRENT_DIR}":"/workspace/${CURRENT_DIR_BASENAME}" \
@@ -32,4 +33,4 @@ docker run -it --rm \
   -v "${CLAUDE_CODE_HOME}/.claude.json":"/home/node/.claude.json" \
   --entrypoint /bin/bash \
   "${DOCKER_IMG}" \
-  -c 'cd /workspace/"'"${CURRENT_DIR_BASENAME}"'" && claude'
+  -c 'cd /workspace/"'"${CURRENT_DIR_BASENAME}"'" && claude "'"${@}"'"'

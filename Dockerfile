@@ -33,7 +33,7 @@ RUN ARCH=$(dpkg --print-architecture) && \
 USER node
 
 ENV NPM_CONFIG_PREFIX=/usr/local/share/npm-global
-ENV PATH=$PATH:/usr/local/share/npm-global/bin
+ENV PATH=$PATH:/usr/local/share/npm-global/bin:/home/node/.local/bin
 
 ENV SHELL /bin/zsh
 
@@ -47,6 +47,8 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
 
 # https://github.com/johnhuang316/code-index-mcp
 RUN pip install --break-system-packages code-index-mcp
+
+RUN pip install --break-system-packages uvx
 
 RUN npm install -g @anthropic-ai/claude-code
 
