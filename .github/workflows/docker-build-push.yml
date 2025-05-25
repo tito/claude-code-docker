@@ -63,6 +63,12 @@ jobs:
         echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
         echo "tag=$NEW_TAG" >> $GITHUB_OUTPUT
 
+    - name: Create version file
+      run: |
+        GIT_SHA=$(git rev-parse --short HEAD)
+        DATE_TIME=$(date -u +"%Y-%m-%dT%H:%M:%S-%N")
+        echo "${GIT_SHA}-${DATE_TIME}" > version.txt
+
     - name: Create and push new tag
       run: |
         git tag ${{ steps.version.outputs.tag }}
@@ -83,14 +89,9 @@ jobs:
           GIT_SHA=${{ github.sha }}
           DATE_TIME=${{ github.run_id }}
 
-    - name: Load and tag Docker image
+    - name: Load Docker image
       run: |
         docker load --input /tmp/docker-image.tar
-        
-        # Create version.txt file as done in docker-build.sh
-        GIT_SHA=$(git rev-parse --short HEAD)
-        DATE_TIME=$(date -u +"%Y-%m-%dT%H:%M:%S-%N")
-        echo "${GIT_SHA}-${DATE_TIME}" > version.txt
 
     - name: Push Docker image
       run: |
