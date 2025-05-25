@@ -4,18 +4,27 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 source "${DIR}"/igd-utils-lib.sh
 
-TAG=$1
+TAG1=$1
+TAG2=$2
 
-if [[ -z "${TAG}" ]]; then
-  TAG=${IGD_UTILS_DOCKER_TAG}
+if [[ -z "${TAG1}" ]]; then
+  TAG1=${IGD_UTILS_DOCKER_TAG}
 fi
 
-LOCAL_DOCKER_IMG=${IGD_UTILS_DOCKER_IMG}:${TAG}
-
-REMOTE_DOCKER_IMG=${IGD_UTILS_REMOTE_DOCKER_USER}/${IGD_UTILS_DOCKER_IMG}:${TAG}
+LOCAL_PRIMARY_IMG=${IGD_UTILS_DOCKER_IMG}:${TAG1}
+REMOTE_PRIMARY_IMG=${IGD_UTILS_REMOTE_DOCKER_USER}/${IGD_UTILS_DOCKER_IMG}:${TAG1}
 
 set -e
 
-docker tag "${LOCAL_DOCKER_IMG}" "${REMOTE_DOCKER_IMG}"
+echo "Tagging and pushing primary image: ${REMOTE_PRIMARY_IMG}"
+docker tag "${LOCAL_PRIMARY_IMG}" "${REMOTE_PRIMARY_IMG}"
+docker push "${REMOTE_PRIMARY_IMG}"
 
-docker push "${REMOTE_DOCKER_IMG}"
+if [[ -n "${TAG2}" ]]; then
+  LOCAL_SECONDARY_IMG=${IGD_UTILS_DOCKER_IMG}:${TAG2}
+  REMOTE_SECONDARY_IMG=${IGD_UTILS_REMOTE_DOCKER_USER}/${IGD_UTILS_DOCKER_IMG}:${TAG2}
+  
+  echo "Tagging and pushing secondary image: ${REMOTE_SECONDARY_IMG}"
+  docker tag "${LOCAL_SECONDARY_IMG}" "${REMOTE_SECONDARY_IMG}"
+  docker push "${REMOTE_SECONDARY_IMG}"
+fi

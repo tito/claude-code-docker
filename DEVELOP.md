@@ -30,9 +30,17 @@ You can configure the following environment variables:
 
 ### Building the Docker Image
 
+Build with a single tag:
 ```bash
 ./docker-build.sh
 ```
+
+Build with multiple tags (e.g., version and latest):
+```bash
+./docker-build.sh 0.2.0 latest
+```
+
+This will build the image with the first tag (0.2.0) and then tag it with the second tag (latest).
 
 ### Running Claude Code in Docker Locally
 
@@ -48,9 +56,17 @@ CLAUDE_CODE_HOME=/path/to/custom/dir ./docker-run-local.sh
 
 ### Publishing the Docker Image
 
+Push with a single tag:
 ```bash
 ./docker-push.sh
 ```
+
+Push with multiple tags (e.g., version and latest):
+```bash
+./docker-push.sh 0.2.0 latest
+```
+
+This will tag and push both versions to the remote registry.
 
 ## Technical Details
 
