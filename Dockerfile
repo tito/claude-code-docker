@@ -45,10 +45,12 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
   -a "export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
   -x
 
-# https://github.com/johnhuang316/code-index-mcp
-RUN pip install --break-system-packages code-index-mcp
+COPY version.txt /home/node/version.txt
 
-RUN pip install --break-system-packages uv
+# https://github.com/johnhuang316/code-index-mcp
+RUN pip install --upgrade --break-system-packages code-index-mcp
+
+RUN pip install --upgrade --break-system-packages uv
 
 RUN npm install -g @anthropic-ai/claude-code
 
