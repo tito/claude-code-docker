@@ -13,93 +13,72 @@ env:
   IGD_UTILS_DOCKER_IMG: ${{ secrets.DOCKER_IMAGE_NAME }}
   IGD_UTILS_DOCKER_TAG: latest
 
+concurrency:
+  group: docker-build-push
+  cancel-in-progress: false
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0 # Fetch all history for tags
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for tags
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Get latest version and increment
-      id: version
-      run: |
-        # Get the latest tag, default to v0.1.0 if no tags exist
-        LATEST_TAG=$(git tag --list --sort=-version:refname | head -1)
-        if [ -z "$LATEST_TAG" ]; then
-          LATEST_TAG="v0.1.0"
-        fi
-        
-        echo "Latest tag: $LATEST_TAG"
-        
-        # Extract version numbers (remove 'v' prefix)
-        VERSION=${LATEST_TAG#v}
-        
-        # Split version into parts
-        IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
-        
-        # Increment patch version
-        PATCH=$((PATCH + 1))
-        
-        # Create new version
-        NEW_VERSION="$MAJOR.$MINOR.$PATCH"
-        NEW_TAG="v$NEW_VERSION"
-        
-        echo "New version: $NEW_VERSION"
-        echo "New tag: $NEW_TAG"
-        
-        # Set outputs for next steps
-        echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
-        echo "tag=$NEW_TAG" >> $GITHUB_OUTPUT
+      - name: Get latest version and increment
+        id: version
+        run: |
+          chmod +x ./scripts/get-next-version.sh
+          ./scripts/get-next-version.sh
 
-    - name: Create version file
-      run: |
-        GIT_SHA=$(git rev-parse --short HEAD)
-        DATE_TIME=$(date -u +"%Y-%m-%dT%H:%M:%S-%N")
-        echo "${GIT_SHA}-${DATE_TIME}" > version.txt
+      - name: Create version file
+        run: |
+          GIT_SHA=$(git rev-parse --short HEAD)
+          DATE_TIME=$(date -u +"%Y-%m-%dT%H:%M:%S-%N")
+          echo "${GIT_SHA}-${DATE_TIME}" > version.txt
 
-    - name: Create and push new tag
-      run: |
-        git tag ${{ steps.version.outputs.tag }}
-        git push origin ${{ steps.version.outputs.tag }}
+      - name: Create and push new tag
+        run: |
+          git tag ${{ steps.version.outputs.tag }}
+          git push origin ${{ steps.version.outputs.tag }}
 
-    - name: Build Docker image with cache
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        push: false
-        tags: |
-          ${{ env.IGD_UTILS_DOCKER_IMG }}:${{ steps.version.outputs.version }}
-          ${{ env.IGD_UTILS_DOCKER_IMG }}:latest
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        outputs: type=docker,dest=/tmp/docker-image.tar
-        build-args: |
-          GIT_SHA=${{ github.sha }}
-          DATE_TIME=${{ github.run_id }}
+      - name: Build Docker image with cache
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: |
+            ${{ env.IGD_UTILS_DOCKER_IMG }}:${{ steps.version.outputs.version }}
+            ${{ env.IGD_UTILS_DOCKER_IMG }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          outputs: type=docker,dest=/tmp/docker-image.tar
+          build-args: |
+            GIT_SHA=${{ github.sha }}
+            DATE_TIME=${{ github.run_id }}
 
-    - name: Load Docker image
-      run: |
-        docker load --input /tmp/docker-image.tar
+      - name: Load Docker image
+        run: |
+          docker load --input /tmp/docker-image.tar
 
-    - name: Push Docker image
-      run: |
-        chmod +x ./docker-push.sh
-        ./docker-push.sh ${{ steps.version.outputs.version }} latest
+      - name: Push Docker image
+        run: |
+          chmod +x ./docker-push.sh
+          ./docker-push.sh ${{ steps.version.outputs.version }} latest
 
-    - name: Output build info
-      run: |
-        echo "Built and pushed Docker image with tags:"
-        echo "- ${{ steps.version.outputs.version }}"
-        echo "- latest"
+      - name: Output build info
+        run: |
+          echo "Built and pushed Docker image with tags:"
+          echo "- ${{ steps.version.outputs.version }}"
+          echo "- latest"
